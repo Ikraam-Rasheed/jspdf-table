@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced Features Demo - jspdf-table</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .demo-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+    .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
+    button { padding: 10px 15px; margin: 5px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 3px; }
+    button:hover { background: #0056b3; }
+    .code-example { background: #f8f9fa; padding: 10px; margin: 10px 0; border-radius: 3px; font-family: monospace; font-size: 12px; overflow-x: auto; }
+    .feature-description { margin-bottom: 10px; color: #666; }
+  </style>
+</head>
+<body>
+  <h1>Advanced Features Demo - jspdf-table v1.2.0</h1>
+  <p>Explore the enhanced table functionality with improved column width calculation, text wrapping, borders, alignment, and more!</p>
+
+  <div class="feature-grid">
+    
+    <div class="demo-section">
+      <h3>🎯 Column Alignment & Width Control</h3>
+      <div class="feature-description">Control column widths, alignment, and constraints</div>
+      <button onclick="testColumnAlignment()">Generate Aligned Table</button>
+      <div class="code-example">
+columns: [
+  { header: 'ID', dataKey: 'id', width: 50, align: 'center' },
+  { header: 'Name', dataKey: 'name', minWidth: 80, align: 'left' },
+  { header: 'Price', dataKey: 'price', align: 'right', headerAlign: 'center' },
+  { header: 'Status', dataKey: 'status', width: '20%', align: 'center' }
+]
+      </div>
+    </div>
+
+    <div class="demo-section">
+      <h3>📝 Text Wrapping</h3>
+      <div class="feature-description">Automatic text wrapping for long content</div>
+      <button onclick="testTextWrapping()">Generate Wrapped Text Table</button>
+      <div class="code-example">
+columns: [
+  { header: 'Title', dataKey: 'title', wrap: true, maxWidth: 120 },
+  { header: 'Description', dataKey: 'desc', wrap: true, width: 200 }
+]
+      </div>
+    </div>
+
+    <div class="demo-section">
+      <h3>🎨 Advanced Styling & Themes</h3>
+      <div class="feature-description">Multiple themes and custom styling options</div>
+      <button onclick="testAdvancedStyling()">Generate Styled Table</button>
+      <div class="code-example">
+options: {
+  theme: 'minimal',
+  showBorders: true,
+  alternateRowColors: true,
+  headerStyles: { fontSize: 12, fontStyle: 'bold' },
+  bodyStyles: { fontSize: 10, lineHeight: 1.3 }
+}
+      </div>
+    </div>
+
+    <div class="demo-section">
+      <h3>📐 Column Width Modes</h3>
+      <div class="feature-description">Different algorithms for calculating column widths</div>
+      <button onclick="testColumnWidthModes()">Test Width Modes</button>
+      <div class="code-example">
+// Auto: Scale to fit page width
+// Content: Based on content size
+// Equal: All columns same width
+// Fixed: Use specified widths
+      </div>
+    </div>
+
+    <div class="demo-section">
+      <h3>🖼️ Custom Borders & Colors</h3>
+      <div class="feature-description">Fine-grained border and color control</div>
+      <button onclick="testCustomBorders()">Generate Custom Borders</button>
+      <div class="code-example">
+borderStyles: {
+  top: true, bottom: 2, 
+  vertical: 0.5, horizontal: 1
+},
+headerStyles: {
+  fillColor: [52, 152, 219],
+  textColor: [255, 255, 255]
+}
+      </div>
+    </div>
+
+    <div class="demo-section">
+      <h3>📄 Multi-page Tables</h3>
+      <div class="feature-description">Automatic page breaks with header repetition</div>
+      <button onclick="testMultiPageTable()">Generate Large Table</button>
+      <div class="code-example">
+options: {
+  pageBreak: 'auto',
+  showHeader: true,
+  // Headers automatically repeat on new pages
+}
+      </div>
+    </div>
+
+    <div class="demo-section">
+      <h3>📊 Table Positioning & Margins</h3>
+      <div class="feature-description">Control table positioning and spacing</div>
+      <button onclick="testTablePositioning()">Test Positioning</button>
+      <div class="code-example">
+options: {
+  margin: { top: 20, left: 30, right: 20, bottom: 15 },
+  tableWidth: '80%',
+  startY: 50
+}
+      </div>
+    </div>
+
+    <div class="demo-section">
+      <h3>🔧 Return Values & Chaining</h3>
+      <div class="feature-description">Get table dimensions and position for further processing</div>
+      <button onclick="testReturnValues()">Test Return Values</button>
+      <div class="code-example">
+const result = autoTable(doc, columns, data, options);
+// Returns: { finalY, tableWidth, tableHeight, pageCount }
+      </div>
+    </div>
+
+  </div>
+
+  <script src="./jspdf.umd.min.js"></script>
+  <script src="../dist/index.umd.js"></script>
+  <script>
+    const { jsPDF } = window.jspdf;
+    const { autoTable } = window.jspdfDynamicTables;
+
+    function testColumnAlignment() {
+      const doc = new jsPDF();
+      
+      const columns = [
+        { header: 'ID', dataKey: 'id', width: 50, align: 'center' },
+        { header: 'Product Name', dataKey: 'name', minWidth: 80, align: 'left' },
+        { header: 'Price ($)', dataKey: 'price', align: 'right', headerAlign: 'center', width: 70 },
+        { header: 'Status', dataKey: 'status', width: '20%', align: 'center' }
+      ];
+
+      const data = [
+        { id: 1, name: 'Laptop Computer', price: 1299.99, status: 'In Stock' },
+        { id: 2, name: 'Mouse', price: 29.99, status: 'Low Stock' },
+        { id: 3, name: 'Keyboard', price: 79.99, status: 'Out of Stock' },
+        { id: 4, name: 'Monitor 27"', price: 349.99, status: 'In Stock' }
+      ];
+
+      autoTable(doc, columns, data, {
+        startY: 30,
+        theme: 'grid',
+        headerStyles: {
+          fillColor: [52, 152, 219],
+          textColor: [255, 255, 255],
+          fontStyle: 'bold'
+        }
+      });
+
+      doc.text('Column Alignment Demo', 20, 20);
+      doc.save('column-alignment-demo.pdf');
+    }
+
+    function testTextWrapping() {
+      const doc = new jsPDF();
+      
+      const columns = [
+        { header: 'Article Title', dataKey: 'title', wrap: true, maxWidth: 120, align: 'left' },
+        { header: 'Description', dataKey: 'desc', wrap: true, width: 200, align: 'left' },
+        { header: 'Category', dataKey: 'category', width: 80, align: 'center' }
+      ];
+
+      const data = [
+        { 
+          title: 'Advanced JavaScript Techniques for Modern Web Development',
+          desc: 'This comprehensive guide covers advanced JavaScript patterns, ES6+ features, async programming, and performance optimization techniques that every developer should know.',
+          category: 'Programming'
+        },
+        { 
+          title: 'Machine Learning Fundamentals',
+          desc: 'An introduction to machine learning concepts including supervised learning, unsupervised learning, neural networks, and practical applications in real-world scenarios.',
+          category: 'AI/ML'
+        },
+        { 
+          title: 'Cloud Architecture Best Practices',
+          desc: 'Learn how to design scalable, reliable, and cost-effective cloud solutions using modern cloud platforms and architectural patterns.',
+          category: 'Cloud'
+        }
+      ];
+
+      autoTable(doc, columns, data, {
+        startY: 30,
+        theme: 'striped',
+        styles: {
+          fontSize: 9,
+          cellPadding: 5,
+          lineHeight: 1.3
+        },
+        headerStyles: {
+          fontSize: 10,
+          fontStyle: 'bold'
+        }
+      });
+
+      doc.text('Text Wrapping Demo', 20, 20);
+      doc.save('text-wrapping-demo.pdf');
+    }
+
+    function testAdvancedStyling() {
+      const doc = new jsPDF();
+      
+      const columns = [
+        { header: 'Employee', dataKey: 'name', align: 'left' },
+        { header: 'Department', dataKey: 'dept', align: 'center' },
+        { header: 'Salary', dataKey: 'salary', align: 'right' },
+        { header: 'Performance', dataKey: 'performance', align: 'center' }
+      ];
+
+      const data = [
+        { name: 'John Doe', dept: 'Engineering', salary: '$85,000', performance: 'Excellent' },
+        { name: 'Jane Smith', dept: 'Marketing', salary: '$72,000', performance: 'Good' },
+        { name: 'Bob Johnson', dept: 'Sales', salary: '$68,000', performance: 'Excellent' },
+        { name: 'Alice Brown', dept: 'HR', salary: '$65,000', performance: 'Good' },
+        { name: 'Charlie Wilson', dept: 'Engineering', salary: '$92,000', performance: 'Outstanding' }
+      ];
+
+      autoTable(doc, columns, data, {
+        startY: 30,
+        theme: 'minimal',
+        showBorders: true,
+        alternateRowColors: true,
+        styles: {
+          fontSize: 10,
+          cellPadding: 6,
+          lineHeight: 1.4
+        },
+        headerStyles: {
+          fontSize: 12,
+          fontStyle: 'bold',
+          fillColor: [46, 125, 50],
+          textColor: [255, 255, 255],
+          cellPadding: 8
+        },
+        bodyStyles: {
+          fillColor: [255, 255, 255],
+          textColor: [33, 33, 33]
+        },
+        alternateRowStyles: {
+          fillColor: [248, 249, 250]
+        },
+        borderStyles: {
+          top: 1,
+          bottom: 1,
+          horizontal: 0.5,
+          vertical: 0.5
+        }
+      });
+
+      doc.text('Advanced Styling Demo', 20, 20);
+      doc.save('advanced-styling-demo.pdf');
+    }
+
+    function testColumnWidthModes() {
+      const doc = new jsPDF();
+      
+      const columns = [
+        { header: 'ID', dataKey: 'id' },
+        { header: 'Name', dataKey: 'name' },
+        { header: 'Email', dataKey: 'email' },
+        { header: 'Department', dataKey: 'dept' }
+      ];
+
+      const data = [
+        { id: 1, name: 'John', email: 'john@company.com', dept: 'Engineering' },
+        { id: 2, name: 'Jane', email: 'jane@company.com', dept: 'Marketing' }
+      ];
+
+      // Auto mode
+      autoTable(doc, columns, data, {
+        startY: 30,
+        columnWidthMode: 'auto',
+        headerStyles: { fillColor: [255, 193, 7] }
+      });
+
+      // Equal mode
+      const result1 = autoTable(doc, columns, data, {
+        startY: 80,
+        columnWidthMode: 'equal',
+        headerStyles: { fillColor: [220, 53, 69] }
+      });
+
+      // Content mode
+      autoTable(doc, columns, data, {
+        startY: result1.finalY + 20,
+        columnWidthMode: 'content',
+        headerStyles: { fillColor: [40, 167, 69] }
+      });
+
+      doc.text('Column Width Modes Demo', 20, 20);
+      doc.text('Auto Mode (scales to fit)', 20, 25);
+      doc.text('Equal Mode (all same width)', 20, 75);
+      doc.text('Content Mode (based on content)', 20, result1.finalY + 15);
+      
+      doc.save('column-width-modes-demo.pdf');
+    }
+
+    function testCustomBorders() {
+      const doc = new jsPDF();
+      
+      const columns = [
+        { header: 'Quarter', dataKey: 'quarter', align: 'center' },
+        { header: 'Revenue', dataKey: 'revenue', align: 'right' },
+        { header: 'Growth', dataKey: 'growth', align: 'center' },
+        { header: 'Target', dataKey: 'target', align: 'right' }
+      ];
+
+      const data = [
+        { quarter: 'Q1 2024', revenue: '$2.5M', growth: '+12%', target: '$2.3M' },
+        { quarter: 'Q2 2024', revenue: '$2.8M', growth: '+15%', target: '$2.6M' },
+        { quarter: 'Q3 2024', revenue: '$3.1M', growth: '+18%', target: '$2.9M' },
+        { quarter: 'Q4 2024', revenue: '$3.4M', growth: '+20%', target: '$3.2M' }
+      ];
+
+      autoTable(doc, columns, data, {
+        startY: 30,
+        theme: 'plain',
+        showBorders: true,
+        styles: {
+          fontSize: 11,
+          cellPadding: 8
+        },
+        headerStyles: {
+          fontSize: 12,
+          fontStyle: 'bold',
+          fillColor: [52, 152, 219],
+          textColor: [255, 255, 255],
+          borderColor: [41, 128, 185]
+        },
+        bodyStyles: {
+          fillColor: [255, 255, 255],
+          textColor: [44, 62, 80],
+          borderColor: [189, 195, 199]
+        },
+        borderStyles: {
+          top: 2,
+          bottom: 2,
+          left: 1,
+          right: 1,
+          horizontal: 0.5,
+          vertical: 1
+        }
+      });
+
+      doc.text('Custom Borders & Colors Demo', 20, 20);
+      doc.save('custom-borders-demo.pdf');
+    }
+
+    function testMultiPageTable() {
+      const doc = new jsPDF();
+      
+      const columns = [
+        { header: 'ID', dataKey: 'id', width: 30, align: 'center' },
+        { header: 'Customer Name', dataKey: 'name', align: 'left' },
+        { header: 'Email', dataKey: 'email', align: 'left' },
+        { header: 'Order Total', dataKey: 'total', align: 'right' },
+        { header: 'Status', dataKey: 'status', align: 'center' }
+      ];
+
+      // Generate large dataset
+      const data = Array.from({ length: 50 }, (_, i) => ({
+        id: i + 1,
+        name: `Customer ${i + 1}`,
+        email: `customer${i + 1}@example.com`,
+        total: `$${(Math.random() * 1000 + 50).toFixed(2)}`,
+        status: ['Pending', 'Shipped', 'Delivered', 'Cancelled'][Math.floor(Math.random() * 4)]
+      }));
+
+      const result = autoTable(doc, columns, data, {
+        startY: 30,
+        pageBreak: 'auto',
+        theme: 'striped',
+        showHeader: true,
+        styles: {
+          fontSize: 9,
+          cellPadding: 4
+        },
+        headerStyles: {
+          fontSize: 10,
+          fontStyle: 'bold',
+          fillColor: [155, 89, 182],
+          textColor: [255, 255, 255]
+        }
+      });
+
+      doc.text('Multi-page Table Demo', 20, 20);
+      doc.text(`Generated ${data.length} rows across ${result.pageCount} pages`, 20, 25);
+      doc.save('multi-page-demo.pdf');
+    }
+
+    function testTablePositioning() {
+      const doc = new jsPDF();
+      
+      const columns = [
+        { header: 'Item', dataKey: 'item' },
+        { header: 'Quantity', dataKey: 'qty', align: 'center' },
+        { header: 'Price', dataKey: 'price', align: 'right' }
+      ];
+
+      const data = [
+        { item: 'Widget A', qty: 10, price: '$25.00' },
+        { item: 'Widget B', qty: 5, price: '$45.00' },
+        { item: 'Widget C', qty: 8, price: '$35.00' }
+      ];
+
+      autoTable(doc, columns, data, {
+        startY: 60,
+        margin: { top: 20, left: 40, right: 20, bottom: 15 },
+        tableWidth: '70%',
+        theme: 'grid',
+        headerStyles: {
+          fillColor: [230, 126, 34],
+          textColor: [255, 255, 255]
+        }
+      });
+
+      doc.text('Table Positioning Demo', 20, 30);
+      doc.text('Custom margins and 70% width', 20, 40);
+      doc.text('Centered on page', 20, 50);
+      doc.save('table-positioning-demo.pdf');
+    }
+
+    function testReturnValues() {
+      const doc = new jsPDF();
+      
+      const columns = [
+        { header: 'Task', dataKey: 'task' },
+        { header: 'Status', dataKey: 'status', align: 'center' },
+        { header: 'Priority', dataKey: 'priority', align: 'center' }
+      ];
+
+      const data = [
+        { task: 'Design Homepage', status: 'Complete', priority: 'High' },
+        { task: 'Implement API', status: 'In Progress', priority: 'Medium' },
+        { task: 'Write Tests', status: 'Pending', priority: 'Low' }
+      ];
+
+      const result = autoTable(doc, columns, data, {
+        startY: 40,
+        theme: 'minimal'
+      });
+
+      // Use return values to add content after table
+      doc.text('Return Values Demo', 20, 20);
+      doc.text('Table Information:', 20, 30);
+      doc.text(`Final Y Position: ${result.finalY}`, 20, result.finalY + 10);
+      doc.text(`Table Width: ${result.tableWidth.toFixed(1)}`, 20, result.finalY + 20);
+      doc.text(`Table Height: ${result.tableHeight.toFixed(1)}`, 20, result.finalY + 30);
+      doc.text(`Pages Used: ${result.pageCount}`, 20, result.finalY + 40);
+      
+      // Add another table below
+      autoTable(doc, 
+        [{ header: 'Summary', dataKey: 'summary' }],
+        [{ summary: 'This table was positioned using return values from the previous table!' }],
+        {
+          startY: result.finalY + 60,
+          headerStyles: { fillColor: [46, 204, 113] }
+        }
+      );
+
+      doc.save('return-values-demo.pdf');
+    }
+  </script>
+</body>
+</html>

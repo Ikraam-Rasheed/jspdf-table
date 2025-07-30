@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Error Handling Demo - jspdf-table</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+    .success { background-color: #d4edda; border-color: #c3e6cb; }
+    .error { background-color: #f8d7da; border-color: #f5c6cb; }
+    button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+    .log { background: #f8f9fa; padding: 10px; margin: 10px 0; border-radius: 3px; font-family: monospace; }
+  </style>
+</head>
+<body>
+  <h1>Error Handling Demo - jspdf-table</h1>
+  <p>This demo shows how the library handles various error conditions gracefully.</p>
+
+  <div class="test-section">
+    <h3>✅ Valid Table Generation</h3>
+    <button onclick="testValidTable()">Generate Valid Table</button>
+    <div id="valid-result" class="log"></div>
+  </div>
+
+  <div class="test-section">
+    <h3>❌ Error Handling Tests</h3>
+    <button onclick="testInvalidDocument()">Test Invalid Document</button>
+    <button onclick="testInvalidColumns()">Test Invalid Columns</button>
+    <button onclick="testInvalidData()">Test Invalid Data</button>
+    <button onclick="testInvalidOptions()">Test Invalid Options</button>
+    <div id="error-results" class="log"></div>
+  </div>
+
+  <div class="test-section">
+    <h3>🛡️ Edge Cases</h3>
+    <button onclick="testEmptyData()">Test Empty Data</button>
+    <button onclick="testNullValues()">Test Null/Undefined Values</button>
+    <button onclick="testLargeData()">Test Large Dataset</button>
+    <div id="edge-results" class="log"></div>
+  </div>
+
+  <script src="./jspdf.umd.min.js"></script>
+  <script src="../dist/index.umd.js"></script>
+  <script>
+    const { jsPDF } = window.jspdf;
+    const { autoTable, ValidationError, RenderError, TableError } = window.jspdfDynamicTables;
+
+    function log(elementId, message, isError = false) {
+      const element = document.getElementById(elementId);
+      const timestamp = new Date().toLocaleTimeString();
+      const prefix = isError ? '❌' : '✅';
+      element.innerHTML += `[${timestamp}] ${prefix} ${message}<br>`;
+    }
+
+    function testValidTable() {
+      try {
+        const doc = new jsPDF();
+        const columns = [
+          { header: 'ID', dataKey: 'id' },
+          { header: 'Name', dataKey: 'name' },
+          { header: 'Email', dataKey: 'email' },
+        ];
+        const data = [
+          { id: 1, name: 'John Doe', email: 'john@example.com' },
+          { id: 2, name: 'Jane Smith', email: 'jane@example.com' },
+        ];
+
+        autoTable(doc, columns, data, {
+          startY: 20,
+          margin: 10,
+          theme: 'striped'
+        });
+
+        doc.save('valid-table.pdf');
+        log('valid-result', 'Successfully generated and downloaded valid table PDF');
+      } catch (error) {
+        log('valid-result', `Unexpected error: ${error.message}`, true);
+      }
+    }
+
+    function testInvalidDocument() {
+      try {
+        autoTable(null, [{ header: 'Test', dataKey: 'test' }], []);
+        log('error-results', 'Should have thrown ValidationError', true);
+      } catch (error) {
+        if (error instanceof ValidationError) {
+          log('error-results', `Correctly caught ValidationError: ${error.message}`);
+        } else {
+          log('error-results', `Wrong error type: ${error.constructor.name}`, true);
+        }
+      }
+    }
+
+    function testInvalidColumns() {
+      try {
+        const doc = new jsPDF();
+        autoTable(doc, "not an array", []);
+        log('error-results', 'Should have thrown ValidationError', true);
+      } catch (error) {
+        if (error instanceof ValidationError) {
+          log('error-results', `Correctly caught ValidationError: ${error.message}`);
+        } else {
+          log('error-results', `Wrong error type: ${error.constructor.name}`, true);
+        }
+      }
+    }
+
+    function testInvalidData() {
+      try {
+        const doc = new jsPDF();
+        autoTable(doc, [{ header: 'Test', dataKey: 'test' }], "not an array");
+        log('error-results', 'Should have thrown ValidationError', true);
+      } catch (error) {
+        if (error instanceof ValidationError) {
+          log('error-results', `Correctly caught ValidationError: ${error.message}`);
+        } else {
+          log('error-results', `Wrong error type: ${error.constructor.name}`, true);
+        }
+      }
+    }
+
+    function testInvalidOptions() {
+      try {
+        const doc = new jsPDF();
+        autoTable(doc, [{ header: 'Test', dataKey: 'test' }], [], {
+          startY: -10, // Invalid negative value
+          headerStyles: { fillColor: [300, 0, 0] } // Invalid RGB value
+        });
+        log('error-results', 'Should have thrown ValidationError', true);
+      } catch (error) {
+        if (error instanceof ValidationError) {
+          log('error-results', `Correctly caught ValidationError: ${error.message}`);
+        } else {
+          log('error-results', `Wrong error type: ${error.constructor.name}`, true);
+        }
+      }
+    }
+
+    function testEmptyData() {
+      try {
+        const doc = new jsPDF();
+        autoTable(doc, [{ header: 'Empty Table', dataKey: 'test' }], []);
+        doc.save('empty-table.pdf');
+        log('edge-results', 'Successfully handled empty data array and generated header-only table');
+      } catch (error) {
+        log('edge-results', `Error with empty data: ${error.message}`, true);
+      }
+    }
+
+    function testNullValues() {
+      try {
+        const doc = new jsPDF();
+        const data = [
+          { name: 'Valid', value: 123 },
+          { name: null, value: undefined },
+          { name: 'Another', value: null },
+          { name: '', value: 0 }
+        ];
+        autoTable(doc, [{ header: 'Name', dataKey: 'name' }, { header: 'Value', dataKey: 'value' }], data);
+        doc.save('null-values-table.pdf');
+        log('edge-results', 'Successfully handled null/undefined values in data');
+      } catch (error) {
+        log('edge-results', `Error with null values: ${error.message}`, true);
+      }
+    }
+
+    function testLargeData() {
+      try {
+        const doc = new jsPDF();
+        const largeData = Array.from({ length: 100 }, (_, i) => ({
+          id: i + 1,
+          name: `User ${i + 1}`,
+          email: `user${i + 1}@example.com`,
+          status: i % 2 === 0 ? 'Active' : 'Inactive'
+        }));
+
+        autoTable(doc, [
+          { header: 'ID', dataKey: 'id' },
+          { header: 'Name', dataKey: 'name' },
+          { header: 'Email', dataKey: 'email' },
+          { header: 'Status', dataKey: 'status' }
+        ], largeData, {
+          pageBreak: 'auto',
+          theme: 'grid'
+        });
+
+        doc.save('large-dataset-table.pdf');
+        log('edge-results', 'Successfully generated multi-page table with 100 rows');
+      } catch (error) {
+        log('edge-results', `Error with large dataset: ${error.message}`, true);
+      }
+    }
+  </script>
+</body>
+</html>
