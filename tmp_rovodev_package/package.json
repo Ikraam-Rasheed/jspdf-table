@@ -1,6 +1,6 @@
 {
   "name": "@ikramrasheed/jspdf-table",
-  "version": "1.2.1",
+  "version": "1.2.0",
   "description": "A TypeScript library for creating dynamic tables in jsPDF with automatic page breaks and customizable styling",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
