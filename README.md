@@ -1,5 +1,10 @@
 # jspdf-table
 
+[![npm version](https://badge.fury.io/js/%40ikramrasheed%2Fjspdf-table.svg)](https://badge.fury.io/js/%40ikramrasheed%2Fjspdf-table)
+[![npm downloads](https://img.shields.io/npm/dm/@ikramrasheed/jspdf-table.svg)](https://www.npmjs.com/package/@ikramrasheed/jspdf-table)
+[![GitHub license](https://img.shields.io/github/license/Ikraam-Rasheed/jspdf-table.svg)](https://github.com/Ikraam-Rasheed/jspdf-table/blob/master/LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/Ikraam-Rasheed/jspdf-table.svg)](https://github.com/Ikraam-Rasheed/jspdf-table/stargazers)
+
 A powerful TypeScript library for creating dynamic, feature-rich tables in jsPDF with advanced styling, text wrapping, column alignment, and automatic page breaks.
 
 ## Features
@@ -15,14 +20,20 @@ A powerful TypeScript library for creating dynamic, feature-rich tables in jsPDF
 ## Installation
 
 ```bash
-npm install jspdf-table
+npm install @ikramrasheed/jspdf-table
+```
+
+**Note**: This package requires jsPDF as a peer dependency:
+
+```bash
+npm install jspdf @ikramrasheed/jspdf-table
 ```
 
 ## Basic Usage
 
 ```javascript
 import jsPDF from 'jspdf';
-import { autoTable } from 'jspdf-table';
+import { autoTable } from '@ikramrasheed/jspdf-table';
 
 const doc = new jsPDF();
 
@@ -248,7 +259,7 @@ We welcome contributions from the community! Please see our [Contributing Guide]
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/jspdf-table.git
+git clone https://github.com/Ikraam-Rasheed/jspdf-table.git
 cd jspdf-table
 
 # Install dependencies
@@ -268,6 +279,14 @@ npm start
 - Submit pull requests
 - Improve documentation
 - Star the repository if you find it useful
+
+## NPM Package
+
+This package is published on npm as `@ikramrasheed/jspdf-table`. You can:
+
+- **View on npm**: [https://www.npmjs.com/package/@ikramrasheed/jspdf-table](https://www.npmjs.com/package/@ikramrasheed/jspdf-table)
+- **Install**: `npm install @ikramrasheed/jspdf-table`
+- **Current version**: 1.2.2
 
 ## License
 
